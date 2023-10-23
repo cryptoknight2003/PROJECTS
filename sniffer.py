@@ -1,16 +1,17 @@
-import socket
-from scapy.all import *
+import scapy.all as scapy
 
-sniffer_socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3))
+def sniff_packets(interface):
+    try:
+        # Use the sniff function with the "iface" parameter to specify the network interface.
+        scapy.sniff(iface=interface, store=False, prn=process_packet)
+    except KeyboardInterrupt:
+        print("Packet capture stopped.")
 
-interface = "eth0"
-sniffer_socket.bind((interface, 0))
+def process_packet(packet):
+    # Define your custom packet processing logic here.
+    # In this example, we print a summary of each packet.
+    print(packet.summary())
 
-try:
-    while True:
-        raw_data, addr = sniffer_socket.recvfrom(65535)
-        packet = Ether(raw_data)
-        print(packet.summary())
-
-except KeyboardInterrupt:
-    sniffer_socket.close()
+if __name__ == "__main__":
+    interface = "eth0"  # Replace with the desired network interface
+    sniff_packets(interface)
